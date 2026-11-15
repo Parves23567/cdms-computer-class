@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ছুটির ক্লিয়ারেন্স — আইসিটি শাখা, বিপিএ</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Hind Siliguri',sans-serif;background:#e8e4d8;min-height:100vh;padding:20px;}
+
+.ctrl{max-width:860px;margin:0 auto 18px;background:white;border-radius:10px;
+  box-shadow:0 4px 16px rgba(0,0,0,.13);padding:18px 22px;}
+.ctrl h2{font-size:1rem;color:#1a3a6b;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid #c9a84c;}
+.ctrl-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:580px){.ctrl-grid{grid-template-columns:1fr;}}
+.field{display:flex;flex-direction:column;gap:4px;}
+.field label{font-size:0.77rem;font-weight:700;color:#1a3a6b;}
+.field select,.field input{
+  padding:7px 10px;border:1.5px solid #c0b090;border-radius:6px;
+  font-family:'Hind Siliguri',sans-serif;font-size:0.85rem;background:#fdfaf3;}
+
+/* CL+PL extra row */
+.cl-pl-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  background:#fff8e6;border:1px solid #e8d080;border-radius:6px;padding:8px 12px;margin-top:4px;}
+.cl-pl-row label{font-size:0.78rem;font-weight:700;color:#1a3a6b;white-space:nowrap;}
+.cl-pl-row input{width:70px;padding:5px 8px;border:1.5px solid #c0b090;border-radius:6px;
+  font-family:'Hind Siliguri',sans-serif;font-size:0.84rem;background:white;}
+
+.btn-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+.btn{padding:8px 18px;border-radius:6px;font-family:'Hind Siliguri',sans-serif;
+  font-size:0.85rem;font-weight:700;cursor:pointer;border:none;}
+.btn-gen{background:linear-gradient(135deg,#1a3a6b,#0d2a52);color:white;}
+.btn-print{background:#c9a84c;color:#0a1628;}
+.btn-pdf{background:#28a745;color:white;}
+.btn:hover{opacity:.88;}
+.info-box{font-size:0.76rem;color:#555;background:#f0f4ff;border:1px solid #b0c4f0;
+  border-radius:6px;padding:8px 12px;margin-top:10px;}
+
+/* FORM */
+.form-wrap{max-width:860px;margin:0 auto;}
+.form-page{background:white;padding:60px 70px 65px;box-shadow:0 4px 18px rgba(0,0,0,.15);}
+.form-title{text-align:center;font-size:1.3rem;font-weight:700;
+  text-decoration:underline;margin-bottom:40px;}
+.form-body{font-size:1.08rem;line-height:2.6;color:#111;text-align:justify;}
+.dotline{display:inline-block;border-bottom:1px solid #333;vertical-align:bottom;}
+.sign-block{text-align:center;margin-top:55px;margin-left:auto;width:42%;font-size:1.02rem;font-weight:600;line-height:2.2;}
+
+@page{size:A4;margin:20mm 22mm 22mm 22mm;}
+@media print{
+  body{background:white;padding:0;}
+  .ctrl{display:none!important;}
+  .form-page{box-shadow:none;padding:0;}
+  .form-wrap{max-width:100%;}
+}
+</style>
+</head>
+<body>
+
+<div class="ctrl" id="ctrlPanel">
+  <h2>✦ ছুটির ক্লিয়ারেন্স ফর্ম</h2>
+  <div class="ctrl-grid">
+
+    <div class="field">
+      <label>নাম ও পদবি</label>
+      <select id="selName" onchange="fillBP()">
+        <option value="">— নির্বাচন করুন —</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>বিপি নম্বর</label>
+      <select id="selBP" onchange="syncName()">
+        <option value="">— নির্বাচন করুন —</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>ছুটির ধরন</label>
+      <select id="selType" onchange="toggleCLPL()">
+        <option value="নৈমিত্তিক">নৈমিত্তিক (CL)</option>
+        <option value="পিএল">পিএল (PL)</option>
+        <option value="CL+PL">সিএল + পিএল (CL+PL)</option>
+        <option value="এলএপি">এলএপি (LAP)</option>
+        <option value="আর আর এল">আর আর এল (RRL)</option>
+      </select>
+      <!-- CL+PL sub-inputs -->
+      <div class="cl-pl-row hidden" id="clplRow">
+        <label>সিএল:</label>
+        <input type="text" id="inpCL" placeholder="৩" oninput="updateTotal()"/>
+        <label>দিন &nbsp; পিএল:</label>
+        <input type="text" id="inpPL" placeholder="২" oninput="updateTotal()"/>
+        <label>দিন</label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>ছুটির দিন <span id="totalLabel" style="color:#555;font-weight:400"></span></label>
+      <input type="text" id="inpDays" placeholder="যেমন: ০৫"/>
+    </div>
+
+    <div class="field">
+      <label>ছাড়পত্রের তারিখ</label>
+      <input type="date" id="inpDate"/>
+    </div>
+
+    <div class="field">
+      <label>পূর্বাহ্ন / অপরাহ্ন</label>
+      <select id="selTime">
+        <option value="পূর্বাহ্ন">পূর্বাহ্ন</option>
+        <option value="অপরাহ্ন">অপরাহ্ন</option>
+      </select>
+    </div>
+
+  </div>
+
+  <div class="info-box" id="infoBox">নাম নির্বাচন করলে বিপি নম্বর স্বয়ংক্রিয়ভাবে বসবে।</div>
+
+  <div class="btn-row">
+    <button class="btn btn-gen" onclick="generateForm()">⟩ ফর্ম তৈরি করুন</button>
+    <button class="btn btn-print" onclick="window.print()">🖨 প্রিন্ট</button>
+    <button class="btn btn-pdf" onclick="savePDF()">⬇ PDF সেভ করুন</button>
+  </div>
+</div>
+
+<div class="form-wrap">
+  <div class="form-page" id="formPage">
+    <div class="form-title">ছুটির ক্লিয়ারেন্স</div>
+    <div class="form-body" id="formBody">
+      <div style="text-align:center;color:#bbb;padding:60px 0;font-size:0.95rem">
+        উপরে তথ্য পূরণ করে "ফর্ম তৈরি করুন" বাটনে ক্লিক করুন।
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const STAFF = [
+  // ── পুলিশ পরিদর্শক (PI) ──
+  { name:'পুলিশ পরিদর্শক (নিঃ)/ জনাব এস, এম রাসেল পারভেজ', bp:'৮৬১১১২৮৮৩৩' },
+
+  // ── সাব-ইন্সপেক্টর (SI) ──
+  { name:'এসআই(নিঃ)/মোঃ পারভেজ রানা পলাশ',                  bp:'৯২১৯২২৩৯৩৪' },
+  { name:'এসআই(নিঃ)/মোঃ রকিবুল হাসান',                      bp:'৯০১৯২২৩৮৬৩' },
+  { name:'এসআই(নিঃ)/জলি খাতুন',                              bp:'৯৩২০২২৭২৮৮' },
+  { name:'এসআই(নিঃ)/মোঃ আকবর আলী',                          bp:'৭৮৯৮০৬৯৬৩১' },
+  { name:'এসআই(নিঃ)/জুয়েল রানা',                             bp:'৮৮১৭১৯৯৩০৬' },
+  { name:'এসআই(নিঃ)/মোঃ ইউসুফ আলী',                         bp:'৯৩২০২২৬৪২১' },
+  { name:'এসআই(নিঃ)/প্রহ্লাদ কুমার দেবনাথ',                  bp:'৯২২০২২৬৮৫৭' },
+  { name:'এসআই(নিঃ)/বেনু আক্তার',                            bp:'৭৮৯৭০৭০৫৪২' },
+  { name:'এসআই(নিঃ)/মোঃ ওবায়দুল্লাহ',                       bp:'৯৩২০২২৭৭১৩' },
+  { name:'এসআই(নিঃ)/মোঃ রুকুনুজ্জামান',                      bp:'৭৮৯৭০৬৮২৬৫' },
+
+  // ── অ্যাসিস্ট্যান্ট সাব-ইন্সপেক্টর (ASI) ──
+  { name:'এএসআই(নিঃ)/৯৭৪ আলী হোসাইন',                       bp:'৯১১১১২৮৫৩২' },
+  { name:'এএসআই(নিঃ)/৭৪ সিরাজুল ইসলাম',                     bp:'৯২১১১৪৩০৫৫' },
+  { name:'এএসআই(নিঃ)/আমির বাদশা',                            bp:'৯৮১৭১৯৯৮৯১' },
+  { name:'এএসআই (সঃ)/১৪১ মোঃ শাহিনুর রহমান',                bp:'৯৩১৩১৭৩৬৪০' },
+  { name:'এএসআই (সঃ)/১৯০ মোঃ শহিদুজ্জামান',                 bp:'৯৪১৪১৬৫৭৬৮' },
+  { name:'এএসআই (সঃ)/৫১ মোঃ মনির উদ্দিন রাজু',              bp:'৯৪১৩১৭০০০৭' },
+
+  // ── নায়েক ──
+  { name:'নায়েক/৪৩৬ মোঃ ইব্রাহিম',                          bp:'৯৯১৮২২১৬৪২' },
+  { name:'নায়েক/২১৪ মোঃ আল ফরিদ',                           bp:'৯৬১৬১৮৫৪৯৯' },
+
+  // ── কনস্টেবল ──
+  { name:'কনস্টেবল/২৮০ মোঃ খালিদ হোসেন',                    bp:'৮৬০৮১২০৪৩৬' },
+  { name:'কনস্টেবল/২০৮১ মোঃ আলমগীর হোসেন',                  bp:'৯৬১৬১৮৭০৩৩' },
+  { name:'কনস্টেবল/২৪২ মোঃ তৌহিদুল ইসলাম',                  bp:'৯২১১১৪০৬৯৮' },
+  { name:'কনস্টেবল/৫১৬০ মোঃ আলামিন ইসলাম',                  bp:'৯৬১৭১৯৭৫৬২' },
+  { name:'কনস্টেবল/৪২১ মোঃ সাজ্জাদুল ইসলাম',                bp:'০০২২২৩৯০২৬' },
+  { name:'কনস্টেবল/১০৫ মোঃ তানভীর হোসেন',                   bp:'০১২২২৩৯১৩২' },
+
+  // ── নারী কনস্টেবল ──
+  { name:'নারী কনস্টেবল/৬৩৫ মাহাবুবা আক্তার',               bp:'৮৪১০১৩৫৭২২' },
+  { name:'নারী কনস্টেবল/মোসাঃ সাহিদা খাতুন',                bp:'৯২১১১৩৫০১৯' },
+  { name:'নারী কনস্টেবল/মুক্তা জান্নাতী',                   bp:'৯৩১১১৪০০৫১' },
+];
+
+// Populate dropdowns
+const selName = document.getElementById('selName');
+const selBP   = document.getElementById('selBP');
+STAFF.forEach((s,i)=>{
+  const o1=document.createElement('option'); o1.value=i; o1.textContent=s.name; selName.appendChild(o1);
+  const o2=document.createElement('option'); o2.value=i;
+  o2.textContent=s.bp+' — '+s.name.split('/').pop().trim(); selBP.appendChild(o2);
+});
+
+function fillBP(){
+  const i=selName.value; selBP.value=i;
+  if(i!=='') document.getElementById('infoBox').textContent='বিপি নম্বর: '+STAFF[i].bp+' — নির্বাচিত।';
+}
+function syncName(){ selName.value=selBP.value; fillBP(); }
+
+// CL+PL toggle
+function toggleCLPL(){
+  const t=document.getElementById('selType').value;
+  const row=document.getElementById('clplRow');
+  const daysField=document.getElementById('inpDays');
+  if(t==='CL+PL'){
+    row.classList.remove('hidden');
+    daysField.readOnly=true; daysField.style.background='#f0f0f0';
+    updateTotal();
+  } else {
+    row.classList.add('hidden');
+    daysField.readOnly=false; daysField.style.background='';
+    document.getElementById('totalLabel').textContent='';
+  }
+}
+
+function updateTotal(){
+  const cl=parseInt(toEN(document.getElementById('inpCL').value))||0;
+  const pl=parseInt(toEN(document.getElementById('inpPL').value))||0;
+  const tot=cl+pl;
+  document.getElementById('inpDays').value=tot>0?String(tot):'';
+  document.getElementById('totalLabel').textContent=tot>0?'(মোট: '+BN(tot)+' দিন)':'';
+}
+
+// Bangla helpers
+const BN = n=>String(n).replace(/[0-9]/g,d=>'০১২৩৪৫৬৭৮৯'[d]);
+const toEN = s=>String(s).replace(/[০-৯]/g,d=>({'০':'0','১':'1','২':'2','৩':'3','৪':'4','৫':'5','৬':'6','৭':'7','৮':'8','৯':'9'})[d]||d);
+const MONTHS=['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন',
+               'জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
+function fmtDate(v){
+  if(!v) return '<span class="dotline" style="min-width:200px">&nbsp;</span>';
+  const d=new Date(v+'T00:00:00');
+  return BN(d.getDate())+' '+MONTHS[d.getMonth()]+' '+BN(d.getFullYear())+' খ্রিঃ';
+}
+function dot(w){ return `<span class="dotline" style="min-width:${w}">&nbsp;</span>`; }
+
+// Build leave text
+function leaveText(){
+  const t=document.getElementById('selType').value;
+  const days=document.getElementById('inpDays').value||'......';
+  const daysBN=BN(days);
+
+  if(t==='CL+PL'){
+    const cl=document.getElementById('inpCL').value||'......';
+    const pl=document.getElementById('inpPL').value||'......';
+    const clNum=parseInt(toEN(cl))||0;
+    const plNum=parseInt(toEN(pl))||0;
+    const tot=clNum+plNum;
+    const totStr=tot>0?BN(String(tot)):'......';
+    return `${totStr} (সিএল ${BN(cl)} + পিএল ${BN(pl)}) দিনের <strong>নৈমিত্তিক/পিএল</strong>`;
+  }
+  if(t==='নৈমিত্তিক') return `${daysBN} দিনের <strong>নৈমিত্তিক</strong>`;
+  if(t==='পিএল')       return `${daysBN} দিনের <strong>পিএল</strong>`;
+  return `${daysBN} দিনের <strong>${t}</strong>`;
+}
+
+// GENERATE
+function generateForm(){
+  const idx=selName.value;
+  if(idx===''){alert('অনুগ্রহ করে নাম নির্বাচন করুন।');return;}
+  const p=STAFF[idx];
+  const dateStr=fmtDate(document.getElementById('inpDate').value);
+  const timeVal=document.getElementById('selTime').value;
+  const lv=leaveText();
+
+  document.getElementById('formBody').innerHTML=`
+    <div style="margin-bottom:40px">
+      ${p.name}, বিপি &nbsp;&nbsp;${p.bp}&nbsp;&nbsp; এর ${lv}
+      ছুটির আদেশ হওয়ায় অদ্য ${dateStr} ${timeVal} ছাড়পত্র প্রদান করা যেতে পারে ।
+    </div>
+    <div class="sign-block">
+      ইনচার্জ<br>
+      আইসিটি শাখা<br>
+      বিপিএ, সারদা, রাজশাহী
+    </div>`;
+}
+
+function savePDF(){
+  if(confirm('PDF সেভ করতে প্রিন্ট ডায়ালগে "Save as PDF" বেছে নিন।\nএগিয়ে যেতে OK চাপুন।'))
+    window.print();
+}
+
+// Default today
+const now=new Date(), p=n=>String(n).padStart(2,'0');
+document.getElementById('inpDate').value=
+  `${now.getFullYear()}-${p(now.getMonth()+1)}-${p(now.getDate())}`;
+</script>
+</body>
+</html>
