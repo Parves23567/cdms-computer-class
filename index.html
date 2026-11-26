@@ -942,8 +942,9 @@ function xlsxBlob(sheets){
 }
 function dlBlob(blob,fn){
   const f=new File([blob],fn,{type:blob.type});
-  if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:fn}).catch(()=>{});return;}
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1500);
+  const dl=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1500);};
+  if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:fn}).catch(e=>{if(!e||e.name!=='AbortError')dl();});return;}
+  dl();
 }
 function xlsWeek(){
   const o={t:document.querySelector('input[name=rt]:checked').value,w:$('rwd').value,f:$('rfo').checked};const os=$('rsel').value;$('rsel').value='';
@@ -1184,7 +1185,7 @@ function shSheet(m){
   requestAnimationFrame(()=>{sc.classList.add('on');sh.classList.add('on');});
   const cl=cb=>{sc.classList.remove('on');sh.classList.remove('on');setTimeout(()=>{sc.remove();sh.remove();if(cb)cb();},230);};
   sc.onclick=()=>cl();$('shx').onclick=()=>cl();
-  sh.querySelectorAll('.sh-o').forEach(b=>b.onclick=()=>{const f=b.dataset.f;cl(()=>m==='rep'?qRep({printDuty:'pdf',shot:'img',xlsDay:'xls',wa:'wa'}[f]):dTod(f));});
+  sh.querySelectorAll('.sh-o').forEach(b=>b.onclick=()=>{const f=b.dataset.f;sc.remove();sh.remove();try{m==='rep'?qRep({printDuty:'pdf',shot:'img',xlsDay:'xls',wa:'wa'}[f]):dTod(f);}catch(e){toast('ত্রুটি: '+(e&&e.message||e));}});
 }
 setInterval(()=>{if(curV()===''&&document.visibilityState==='visible')home();},60000);
 /* ---------- ব্যাকআপ ---------- */
