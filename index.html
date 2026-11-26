@@ -193,6 +193,7 @@ button,.bt{transition:transform .1s var(--ease),background .15s}button:active{tr
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .hal.w{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.35);color:#fcd34d}:root:not([data-theme="light"]) .hal.i{background:rgba(59,130,246,.12);border-color:rgba(96,165,250,.35);color:#bfdbfe}:root:not([data-theme="light"]) .hmx .u{background:rgba(245,158,11,.14);color:#fcd34d}:root:not([data-theme="light"]) .hmx .d{background:rgba(56,189,248,.14);color:#7dd3fc}:root:not([data-theme="light"]) .hch.l{background:rgba(245,158,11,.14);color:#fcd34d;border-color:rgba(245,158,11,.35)}:root:not([data-theme="light"]) .hal .bt{color:#fff}}
 :root[data-theme="dark"] .hal.w{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.35);color:#fcd34d}:root[data-theme="dark"] .hal.i{background:rgba(59,130,246,.12);border-color:rgba(96,165,250,.35);color:#bfdbfe}:root[data-theme="dark"] .hmx .u{background:rgba(245,158,11,.14);color:#fcd34d}:root[data-theme="dark"] .hmx .d{background:rgba(56,189,248,.14);color:#7dd3fc}:root[data-theme="dark"] .hch.l{background:rgba(245,158,11,.14);color:#fcd34d;border-color:rgba(245,158,11,.35)}:root[data-theme="dark"] .hal .bt{color:#fff}
 .hrp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.hrp button{min-height:44px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:.9rem;font-weight:600;cursor:pointer}.hrp button.on{background:rgba(45,212,191,.18);border-color:var(--blue);color:var(--blue)}
+.dn{padding:4px 0 6px}
 @keyframes rise{from{opacity:0;transform:translateY(14px)}}
 #hm.anim>*{animation:rise .5s var(--ease) both}#hm.anim>*:nth-child(2){animation-delay:50ms}#hm.anim>*:nth-child(3){animation-delay:90ms}#hm.anim>*:nth-child(4){animation-delay:130ms}#hm.anim>*:nth-child(5){animation-delay:170ms}#hm.anim>*:nth-child(n+6){animation-delay:210ms}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-delay:0ms!important;transition-duration:.01ms!important}}
@@ -854,6 +855,7 @@ function rep(){
   const f1=v=>BN((Math.round(v*10)/10).toString());
   let h='<div class="card"><div class="ct">📊 '+R.label+(onlyFin?'<span class="bd f">শুধু ফাইনাল</span>':'')+'</div>'
   +'<div class="sg"><div>মোট ক্লাস<b>'+BN(total)+'</b></div><div>ডিউটি দিন<b>'+BN(days)+'</b></div><div>ক্লাস নিয়েছেন<b>'+BN(act.length)+' জন</b></div><div>গড় (প্রতি জন)<b>'+f1(avg)+'</b></div></div>';
+  h+='<div class="ct" style="margin-top:10px">প্রশিক্ষক অনুযায়ী ভাগ</div><div class="dn">'+donutHTML(act,total,132,13.5,0)+'</div>';
   h+='<div class="ct" style="margin-top:10px">প্রতিদিনের সারসংক্ষেপ</div>'+perDay.map(d=>'<div class="pdl"><span>'+dstr(d.k)+'</span><b>'+(d.empty?'ডিউটি নেই':BN(d.n)+' ক্লাস · '+(d.fin?'ফাইনাল':'খসড়া'))+'</b></div>').join('');
   const hiN=act.filter(x=>x.n===mx),loN=act.filter(x=>x.n===mn);
   if(mx!==mn)h+='<div class="vd ok" style="background:#fef3c7;color:#78350f">🔺 সর্বোচ্চ ('+BN(mx)+' ক্লাস): '+hiN.map(x=>esc(x.name)).join('; ')+'</div><div class="vd" style="background:#e0f2fe;color:#0c4a6e">🔻 সর্বনিম্ন ('+BN(mn)+' ক্লাস): '+loN.map(x=>esc(x.name)).join('; ')+'</div>';
@@ -896,6 +898,7 @@ function printReport(){
   const f1=v=>BN((Math.round(v*10)/10).toString()),bc=batchCols(),mixed=RD.mx!==RD.mn;
   let b='<div class="sum"><div><b>'+BN(RD.total)+'</b>মোট ক্লাস</div><div><b>'+BN(RD.days)+'</b>ডিউটি দিন</div><div><b>'+BN(RD.act.length)+'</b>প্রশিক্ষক</div><div><b>'+f1(RD.avg)+'</b>গড় (প্রতি জন)</div><div><b>'+BN(RD.mx)+' / '+BN(RD.mn)+'</b>সর্বোচ্চ / সর্বনিম্ন</div></div>';
   if(mixed)b+='<div style="font-size:9.5pt;margin:2px 0"><b>সর্বোচ্চ:</b> '+RD.act.filter(x=>x.n===RD.mx).map(x=>esc(x.name)).join('; ')+'<br><b>সর্বনিম্ন:</b> '+RD.act.filter(x=>x.n===RD.mn).map(x=>esc(x.name)).join('; ')+'</div>';
+  b+='<h4>প্রশিক্ষক অনুযায়ী ভাগ</h4><div style="page-break-inside:avoid">'+donutHTML(RD.act,RD.total,150,10.5,1)+'</div>';
   b+='<h4>সদস্যভিত্তিক হিসাব</h4><table><thead><tr><th>ক্র.</th><th>প্রশিক্ষকের নাম</th><th>মোট</th><th>দিন</th>'+bc.map(x=>'<th>'+esc(x)+'</th>').join('')+'<th>গড়ের ±</th><th>মন্তব্য</th></tr></thead><tbody>';
   RD.all.forEach((x,i)=>{const d=x.n-RD.avg,cl=mixed&&x.n===RD.mx?' class="hi"':mixed&&x.n===RD.mn?' class="lo"':'';
     b+='<tr'+cl+'><td class="c">'+BN(i+1)+'</td><td>'+esc(x.name)+(leaveNote(x.name,RD.R.a,RD.R.b)?'<br><small style="color:#92400e">⛔ '+esc(leaveNote(x.name,RD.R.a,RD.R.b))+'</small>':'')+'</td><td class="c"><b>'+BN(x.n)+'</b></td><td class="c">'+BN(x.dc||0)+'</td>'+bc.map(k=>'<td class="c">'+(x.by[k]?BN(x.by[k]):'–')+'</td>').join('')+'<td class="c">'+(d>=0?'+':'−')+f1(Math.abs(d))+'</td><td class="c">'+(mixed&&x.n===RD.mx?'সর্বোচ্চ':mixed&&x.n===RD.mn?'সর্বনিম্ন':'')+'</td></tr>';});
@@ -1093,13 +1096,25 @@ function histWa(all){
   window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank');
 }
 /* রিপোর্ট ছবি */
+/* ---------- ডোনাট চার্ট ---------- */
+function donutHTML(act,total,sz,fs,pdf){
+  const PAL=['#0f766e','#14b8a6','#2dd4bf','#5eead4','#f59e0b','#fb923c','#94a3b8'];
+  let L=act.map(x=>({n:x.name.replace(/^.*\//,''),c:x.n}));
+  if(L.length>7){const o=L.slice(6).reduce((a,x)=>a+x.c,0);L=L.slice(0,6).concat([{n:'অন্যান্য ('+BN(L.length-6)+' জন)',c:o}]);}
+  const R=42,C=2*Math.PI*R;let off=0,arcs='';
+  L.forEach((x,i)=>{const len=x.c/total*C;arcs+='<circle cx="50" cy="50" r="'+R+'" fill="none" stroke="'+PAL[i%7]+'" stroke-width="16" stroke-dasharray="'+Math.max(len-(L.length>1?1:0),0.1).toFixed(2)+' '+C.toFixed(2)+'" stroke-dashoffset="'+(-off).toFixed(2)+'" transform="rotate(-90 50 50)"/>';off+=len;});
+  const svg='<svg viewBox="0 0 100 100" width="'+sz+'" height="'+sz+'" style="flex:0 0 auto"><circle cx="50" cy="50" r="'+R+'" fill="none" stroke="'+(pdf?'#e5efed':'#e3efed')+'" stroke-width="16"/>'+arcs+'<text x="50" y="49" text-anchor="middle" font-size="17" font-weight="800" fill="#0b3d3f" style="font-family:inherit">'+BN(total)+'</text><text x="50" y="62" text-anchor="middle" font-size="7.5" fill="#555" style="font-family:inherit">মোট ক্লাস</text></svg>';
+  const leg=L.map((x,i)=>'<div style="display:flex;align-items:center;gap:'+(fs*.5)+'px;font-size:'+fs+'px;line-height:1.5;padding:'+(fs*.12)+'px 0"><i style="display:inline-block;width:'+(fs*.75)+'px;height:'+(fs*.75)+'px;border-radius:3px;background:'+PAL[i%7]+';flex:none"></i><span style="flex:1;min-width:0">'+esc(x.n)+'</span><b style="color:#0f766e">'+BN(x.c)+'</b></div>').join('');
+  return '<div style="display:flex;align-items:center;gap:'+(fs*.9)+'px;color:#1a1a1a">'+svg+'<div style="flex:1;min-width:0">'+leg+'</div></div>';
+}
 function repShot(){
   if(!RD){toast('রিপোর্ট নেই');return;}
   const mixed=RD.mx!==RD.mn,L=RD.all;
   const rows=L.map((x,i)=>{const t=mixed&&x.n===RD.mx?'সর্বোচ্চ':mixed&&x.n===RD.mn?'সর্বনিম্ন':'',bt=(x.dc?BN(x.dc)+' দিন · ':'')+Object.keys(x.by||{}).map(k=>esc(k)+' '+BN(x.by[k])).join(' · ');
     return '<div style="padding:8px 4px;border-bottom:1px dashed #b7d8d3"><div style="display:flex;align-items:center;gap:10px"><div style="flex:0 0 34px;font-size:19px;font-weight:700;color:#0f766e">'+BN(i+1)+'.</div><div style="flex:1;font-size:20px;font-weight:600;line-height:1.3">'+esc(x.name)+lvTag(x.name,RD.R.a,RD.R.b,'14px')+(t?' <span style="font-size:13px;font-weight:700;border-radius:8px;padding:1px 8px;background:'+(t==='সর্বোচ্চ'?'#fde68a':'#bae6fd')+'">'+t+'</span>':'')+'</div><div style="flex:0 0 74px;text-align:center;background:#0f766e;color:#fff;border-radius:10px;font-size:24px;font-weight:700;padding:2px 0">'+BN(x.n)+'</div></div>'
      +(bt?'<div style="margin:3px 0 0 44px;font-size:14px;color:#555">'+bt+'</div>':'')+'</div>';}).join('');
-  imgOut(imgFrame('CDMS ক্লাস ডিউটি রিপোর্ট',RD.R.label+(RD.onlyFin?' · শুধু ফাইনাল':''),[[BN(RD.total),'মোট ক্লাস'],[BN(RD.days),'ডিউটি দিন'],[BN((Math.round(RD.avg*10)/10).toString()),'গড় (প্রতি জন)'],[BN(RD.mx)+' / '+BN(RD.mn),'সর্বোচ্চ / সর্বনিম্ন']],rows,''),'cdms-report.png','CDMS ক্লাস ডিউটি রিপোর্ট');
+  const dn='<div style="padding:12px 4px 14px;border-bottom:2px solid #b7d8d3"><div style="font-size:18px;font-weight:700;color:#0f766e;margin-bottom:8px">প্রশিক্ষক অনুযায়ী ভাগ</div>'+donutHTML(RD.act,RD.total,200,17,0)+'</div>';
+  imgOut(imgFrame('CDMS ক্লাস ডিউটি রিপোর্ট',RD.R.label+(RD.onlyFin?' · শুধু ফাইনাল':''),[[BN(RD.total),'মোট ক্লাস'],[BN(RD.days),'ডিউটি দিন'],[BN((Math.round(RD.avg*10)/10).toString()),'গড় (প্রতি জন)'],[BN(RD.mx)+' / '+BN(RD.mn),'সর্বোচ্চ / সর্বনিম্ন']],dn+rows,''),'cdms-report.png','CDMS ক্লাস ডিউটি রিপোর্ট');
 }
 /* ---------- নতুন হোম ---------- */
 function ico(n,c){return '<svg class="ic'+(c?' '+c:'')+'"><use href="#i-'+n+'"/></svg>';}
