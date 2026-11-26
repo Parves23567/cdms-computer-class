@@ -1166,7 +1166,7 @@ function home(){
   const fr=act.filter(n=>!busy[n]&&!onLeave(n,t)),lv=act.filter(n=>onLeave(n,t));
   h+='<div class="hs">আজ কে ফ্রি আছেন <a onclick="WK=null;go(\'wk\')">স্মার্ট বন্টন '+ico('chev','s16')+'</a></div><div class="hc">'+(fr.length||lv.length?fr.slice(0,8).map(n=>'<span class="hch">'+esc(sn(n))+'</span>').join('')+(fr.length>8?'<span class="hch">+'+BN(fr.length-8)+'</span>':'')+lv.map(n=>'<span class="hch l">🏖 '+esc(sn(n))+' (ছুটি)</span>').join(''):'<div class="empty">আজ সবাই ডিউটিতে আছেন।</div>')+'</div>';
   /* দ্রুত রিপোর্ট */
-  h+='<div class="hs">এই মাসের রিপোর্ট <a onclick="go(\'rep\');rPre(\'tm\')">সব '+ico('chev','s16')+'</a></div><div class="hq" style="margin-top:0"><button onclick="qRep(\'pdf\')">'+ico('pdf')+'পিডিএফ</button><button onclick="qRep(\'img\')">'+ico('img')+'ছবি</button><button onclick="qRep(\'xls\')">'+ico('xls')+'এক্সেল</button><button onclick="qRep(\'wa\')">'+ico('wa')+'শেয়ার</button></div>';
+  h+='<div class="hs">এই মাসের রিপোর্ট <a onclick="go(\'rep\');rPre(\'tm\')">সব '+ico('chev','s16')+'</a></div><button class="shb" style="margin-top:0" onclick="shSheet(\'rep\')">'+ico('share')+'শেয়ার করুন</button>';
   /* সাম্প্রতিক */
   const rc=Object.keys(st.days).filter(k=>Number(st.days[k].ts)>1e11).sort((a,b)=>st.days[b].ts-st.days[a].ts).slice(0,3);
   const ago=ts=>{const d=Math.floor((new Date(t).getTime()-new Date(fmt(new Date(ts))).getTime())/864e5);return d<=0?'আজ':d===1?'গতকাল':BN(d)+' দিন আগে';};
@@ -1174,7 +1174,7 @@ function home(){
   $('hm').innerHTML=h;
   if(!window._hmA){window._hmA=1;$('hm').classList.add('anim');setTimeout(()=>$('hm').classList.remove('anim'),900);}
 }
-function shSheet(){
+function shSheet(m){
   if($('shs'))return;
   const o=[['printDuty','pdf','পিডিএফ','প্রিন্টের জন্য',''],['shot','img','ছবি','হোয়াটসঅ্যাপ গ্রুপে পাঠাতে',''],['xlsDay','xls','এক্সেল','হিসাবের জন্য',''],['wa','wa','হোয়াটসঅ্যাপ','লেখা হিসেবে পাঠান','wa']];
   const sc=document.createElement('div');sc.className='sh-scrim noprint';sc.id='shs';
@@ -1184,7 +1184,7 @@ function shSheet(){
   requestAnimationFrame(()=>{sc.classList.add('on');sh.classList.add('on');});
   const cl=cb=>{sc.classList.remove('on');sh.classList.remove('on');setTimeout(()=>{sc.remove();sh.remove();if(cb)cb();},230);};
   sc.onclick=()=>cl();$('shx').onclick=()=>cl();
-  sh.querySelectorAll('.sh-o').forEach(b=>b.onclick=()=>{const f=b.dataset.f;cl(()=>dTod(f));});
+  sh.querySelectorAll('.sh-o').forEach(b=>b.onclick=()=>{const f=b.dataset.f;cl(()=>m==='rep'?qRep({printDuty:'pdf',shot:'img',xlsDay:'xls',wa:'wa'}[f]):dTod(f));});
 }
 setInterval(()=>{if(curV()===''&&document.visibilityState==='visible')home();},60000);
 /* ---------- ব্যাকআপ ---------- */
