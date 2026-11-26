@@ -192,6 +192,7 @@ button,.bt{transition:transform .1s var(--ease),background .15s}button:active{tr
 .sh-o div{flex:1;display:flex;flex-direction:column}.sh-o b{font-size:1.02rem;line-height:1.5}.sh-o small{font-size:.8rem;color:var(--mut);line-height:1.5}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .hal.w{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.35);color:#fcd34d}:root:not([data-theme="light"]) .hal.i{background:rgba(59,130,246,.12);border-color:rgba(96,165,250,.35);color:#bfdbfe}:root:not([data-theme="light"]) .hmx .u{background:rgba(245,158,11,.14);color:#fcd34d}:root:not([data-theme="light"]) .hmx .d{background:rgba(56,189,248,.14);color:#7dd3fc}:root:not([data-theme="light"]) .hch.l{background:rgba(245,158,11,.14);color:#fcd34d;border-color:rgba(245,158,11,.35)}:root:not([data-theme="light"]) .hal .bt{color:#fff}}
 :root[data-theme="dark"] .hal.w{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.35);color:#fcd34d}:root[data-theme="dark"] .hal.i{background:rgba(59,130,246,.12);border-color:rgba(96,165,250,.35);color:#bfdbfe}:root[data-theme="dark"] .hmx .u{background:rgba(245,158,11,.14);color:#fcd34d}:root[data-theme="dark"] .hmx .d{background:rgba(56,189,248,.14);color:#7dd3fc}:root[data-theme="dark"] .hch.l{background:rgba(245,158,11,.14);color:#fcd34d;border-color:rgba(245,158,11,.35)}:root[data-theme="dark"] .hal .bt{color:#fff}
+.hrp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.hrp button{min-height:44px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:.9rem;font-weight:600;cursor:pointer}.hrp button.on{background:rgba(45,212,191,.18);border-color:var(--blue);color:var(--blue)}
 @keyframes rise{from{opacity:0;transform:translateY(14px)}}
 #hm.anim>*{animation:rise .5s var(--ease) both}#hm.anim>*:nth-child(2){animation-delay:50ms}#hm.anim>*:nth-child(3){animation-delay:90ms}#hm.anim>*:nth-child(4){animation-delay:130ms}#hm.anim>*:nth-child(5){animation-delay:170ms}#hm.anim>*:nth-child(n+6){animation-delay:210ms}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-delay:0ms!important;transition-duration:.01ms!important}}
@@ -1122,7 +1123,9 @@ function hmDur(n){return n>=60?BN(Math.floor(n/60))+' ঘ. '+(n%60?BN(n%60)+' �
 function sn(n){return String(n||'').replace(/^.*\//,'');}
 function hmDis(k){try{localStorage.setItem('cdms_hd_'+k+'_'+fmt(new Date()),'1');}catch(e){}home();}
 function hmIsDis(k){try{return localStorage.getItem('cdms_hd_'+k+'_'+fmt(new Date()))==='1';}catch(e){return false;}}
-function qRep(k){rPre('tm');({pdf:printReport,img:repShot,xls:xlsRep,wa:()=>window.open('https://wa.me/?text='+encodeURIComponent(REPTXT),'_blank')})[k]();}
+window._hrp='tm';
+function hrp(k,b){window._hrp=k;document.querySelectorAll('.hrp button').forEach(x=>x.classList.toggle('on',x===b));}
+function qRep(k){rPre(window._hrp||'tm');({pdf:printReport,img:repShot,xls:xlsRep,wa:()=>window.open('https://wa.me/?text='+encodeURIComponent(REPTXT),'_blank')})[k]();}
 function home(){
   if(!$('hm'))return;
   const t=fmt(new Date()),now=new Date(),nm=now.getHours()*60+now.getMinutes(),y=st.days[t],rows=y?y.rows:[],ym=t.slice(0,7);
@@ -1167,7 +1170,7 @@ function home(){
   const fr=act.filter(n=>!busy[n]&&!onLeave(n,t)),lv=act.filter(n=>onLeave(n,t));
   h+='<div class="hs">আজ কে ফ্রি আছেন <a onclick="WK=null;go(\'wk\')">স্মার্ট বন্টন '+ico('chev','s16')+'</a></div><div class="hc">'+(fr.length||lv.length?fr.slice(0,8).map(n=>'<span class="hch">'+esc(sn(n))+'</span>').join('')+(fr.length>8?'<span class="hch">+'+BN(fr.length-8)+'</span>':'')+lv.map(n=>'<span class="hch l">🏖 '+esc(sn(n))+' (ছুটি)</span>').join(''):'<div class="empty">আজ সবাই ডিউটিতে আছেন।</div>')+'</div>';
   /* দ্রুত রিপোর্ট */
-  h+='<div class="hs">এই মাসের রিপোর্ট <a onclick="go(\'rep\');rPre(\'tm\')">সব '+ico('chev','s16')+'</a></div><button class="shb" style="margin-top:0" onclick="shSheet(\'rep\')">'+ico('share')+'শেয়ার করুন</button>';
+  const hp=window._hrp||'tm';h+='<div class="hs">রিপোর্ট <a onclick="go(\'rep\');rPre(window._hrp||\'tm\')">সব '+ico('chev','s16')+'</a></div><div class="hrp">'+[['tw','এই সপ্তাহ'],['lw','গত সপ্তাহ'],['tm','এই মাস']].map(x=>'<button class="'+(x[0]===hp?'on':'')+'" onclick="hrp(\''+x[0]+'\',this)">'+x[1]+'</button>').join('')+'</div><button class="shb" style="margin-top:10px" onclick="shSheet(\'rep\')">'+ico('share')+'শেয়ার করুন</button>';
   /* সাম্প্রতিক */
   const rc=Object.keys(st.days).filter(k=>Number(st.days[k].ts)>1e11).sort((a,b)=>st.days[b].ts-st.days[a].ts).slice(0,3);
   const ago=ts=>{const d=Math.floor((new Date(t).getTime()-new Date(fmt(new Date(ts))).getTime())/864e5);return d<=0?'আজ':d===1?'গতকাল':BN(d)+' দিন আগে';};
